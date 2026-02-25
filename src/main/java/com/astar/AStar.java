@@ -22,6 +22,18 @@ class AStar {
         ArrayList<Space> path = new ArrayList<Space>();
 
         // TODO: Implement AStar
+        //Space goal = board.getSpace(end.x, end.y);
+        Space current = board.getSpace(start);
+        current.setG(0);
+        while (current.getType() != SpaceType.END) {
+            for (Space s : board.getNeighbors(current)) {
+                if (s.getType() != SpaceType.BLOCK) {
+                    int g = current.getG() + 1;
+                    
+                    
+                }
+            }
+        }
 
         return path;
     }
