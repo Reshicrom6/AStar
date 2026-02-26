@@ -1,7 +1,7 @@
 package com.astar;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 
 //By: Brandon Beckwith
 class AStar {
@@ -20,21 +20,57 @@ class AStar {
 
         //Setup an ArrayList to hold the path to  return to the GUI
         ArrayList<Space> path = new ArrayList<Space>();
-
+    
         // TODO: Implement AStar
-        //Space goal = board.getSpace(end.x, end.y);
-        Space current = board.getSpace(start);
-        current.setG(0);
-        while (current.getType() != SpaceType.END) {
-            for (Space s : board.getNeighbors(current)) {
-                if (s.getType() != SpaceType.BLOCK) {
-                    int g = current.getG() + 1;
-                    
-                    
+        Space startSpace = board.getSpace(start);
+        Space endSpace = board.getSpace(end);
+
+        startSpace.setG(0);
+        startSpace.setH(manhattan(startSpace, endSpace));
+
+        PriorityQueue<Space> frontier = new PriorityQueue<>(); 
+        frontier.add(startSpace);
+
+        Set<Space> explored = new HashSet<>();
+
+        Space current = null;
+
+        while (!frontier.isEmpty()) {
+            current = frontier.poll();
+
+            if (current.getPoint().equals(end)) break;
+
+            if (explored.contains(current)) continue;
+            explored.add(current);
+
+            for (Space neighbor : board.getNeighbors(current)) {
+                if (explored.contains(neighbor)) continue;
+
+                int g = current.getG() + 1;
+
+                if (neighbor.getG() == 0 || g < neighbor.getG()) {
+                    neighbor.setG(g);
+                    neighbor.setH((manhattan(neighbor, endSpace)));
+                    neighbor.setPrevious(current);
+
+                    frontier.add(neighbor);
                 }
             }
         }
 
+        if (current != null && current.getPoint().equals(end)) {
+            Space node = current;
+            while (node != null) {
+                path.add(0, node);
+                node = node.getPrevious();
+            }
+        }
+
+        path.getLast().setType(SpaceType.END);
         return path;
+    }
+
+    private static int manhattan(Space from, Space to) {
+        return Math.abs(from.getX() - to.getX()) + Math.abs(from.getY() - to.getY());
     }
 }
